@@ -44,11 +44,22 @@ public let fairmaticErrorDomain: Swift.String
     get
   }
 }
-extension FairmaticSDK.FairmaticError : Foundation.LocalizedError {
-  public var errorDescription: Swift.String? {
+extension FairmaticSDK.FairmaticError : Foundation.CustomNSError {
+  public static var errorDomain: Swift.String {
+    get
+  }
+  public var errorCode: Swift.Int {
+    get
+  }
+  public var errorUserInfo: [Swift.String : Any] {
     get
   }
   public static var _nsErrorDomain: Swift.String {
+    get
+  }
+}
+extension FairmaticSDK.FairmaticError : Foundation.LocalizedError {
+  public var errorDescription: Swift.String? {
     get
   }
 }

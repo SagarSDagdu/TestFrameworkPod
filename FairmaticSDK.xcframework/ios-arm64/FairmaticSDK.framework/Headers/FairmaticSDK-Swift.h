@@ -670,7 +670,7 @@ SWIFT_CLASS_NAMED("DriveResumeInfo")
 /// nil in case of auto detected drives.
 @property (nonatomic, copy) NSString * _Nullable trackingId;
 /// Session id is specified by the enclosing application when it wants to
-/// record a session using <code>Zendrive.startSession(_:)</code>
+/// record a session using <code>Fairmatic.startSession(_:)</code>
 /// sessionId will be nil if there is no session associated with that drive.
 @property (nonatomic, copy) NSString * _Nullable sessionId;
 /// The start timestamp of the gap in drive recording in milliseconds.
@@ -793,7 +793,7 @@ SWIFT_CLASS_NAMED("DriverAttributes")
 /// returns:
 /// <code>true</code>, if the value was set, <code>false</code> otherwise.
 - (BOOL)setGroup:(NSString * _Nonnull)groupId SWIFT_WARN_UNUSED_RESULT;
-/// The service level of a driver. This is useful for applications where <code>Zendrive</code> supports
+/// The service level of a driver. This is useful for applications where <code>Fairmatic</code> supports
 /// different service levels for different drivers. See ServiceLevel
 /// for more information about this attribute.
 /// \param serviceLevel service tier of the user.
@@ -1176,7 +1176,7 @@ SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly) BOOL isAccidentDetec
 /// if a particular event will be detected by the SDK on this device.
 SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) NSDictionary * _Nonnull getEventSupportForDevice;)
 + (NSDictionary * _Nonnull)getEventSupportForDevice SWIFT_WARN_UNUSED_RESULT;
-/// Send a debug report of the current driver to Zendrive.
+/// Send a debug report of the current driver to Fairmatic.
 /// The Fairmatic SDK will create a background task to ensure the
 /// completion of this upload task.
 + (void)uploadAllDebugDataAndLogs;
@@ -1530,7 +1530,7 @@ SWIFT_CLASS_NAMED("FairmaticTest")
 /// In case of multiple callbacks enabled, on invoking this method, you will get a potential accident callback
 /// on your delegate. After <code>MockAccidentConfig.delayBetweenCallbacks</code>seconds, you will
 /// get a final accident callback.
-/// In case only single callback is enabled by setting <code>ZendriveConfiguration.implementsMultipleAccidentCallbacks</code> as <code>false</code>,
+/// In case only single callback is enabled by setting <code>FairmaticConfiguration.implementsMultipleAccidentCallbacks</code> as <code>false</code>,
 /// on invoking this method, you will get a final accident callback callback.
 /// You can look at console logs for debugging in case you do not receive the callback.
 /// If issue persists, reach out to your contact at Fairmatic.
@@ -2073,7 +2073,7 @@ typedef SWIFT_ENUM_NAMED(NSInteger, FairmaticUserMode, "UserMode", open) {
 /// <code>DriveInfo.score</code> will have default value. All other values will be set.
   FairmaticUserModePassenger = 1,
 /// Indicates that either <code>DriveInfo.driveType</code> is not
-/// <code>DriveType.drive</code> or <code>Zendrive</code> was not able to determine user mode.
+/// <code>DriveType.drive</code> or <code>Fairmatic</code> was not able to determine user mode.
 /// All values in <code>DriveInfo</code> will be set.
   FairmaticUserModeUnavailable = 2,
 };
