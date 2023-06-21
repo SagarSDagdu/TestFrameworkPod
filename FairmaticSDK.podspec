@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   # s.static_framework = true
   s.cocoapods_version = '>= 1.9.0'
   s.platform       = :ios, '11.0'
-  s.source         = { :http => "https://github.com/SagarSDagdu/TestFrameworkPod.git" }
+  s.source         = { :git => "https://github.com/SagarSDagdu/TestFrameworkPod.git" }
   s.libraries      = "z.1.1.3", "sqlite3", "c++"
   s.requires_arc = true
   s.default_subspec = 'Standard'
