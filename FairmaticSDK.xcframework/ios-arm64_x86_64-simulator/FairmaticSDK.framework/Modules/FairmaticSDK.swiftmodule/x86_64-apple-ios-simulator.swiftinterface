@@ -1,5 +1,5 @@
 // swift-interface-format-version: 1.0
-// swift-compiler-version: Apple Swift version 5.8 (swiftlang-5.8.0.124.2 clang-1403.0.22.11.100)
+// swift-compiler-version: Apple Swift version 5.7 (swiftlang-5.7.0.127.4 clang-1400.0.29.50)
 // swift-module-flags: -target x86_64-apple-ios11.0-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -module-name FairmaticSDK
 // swift-module-flags-ignorable: -enable-bare-slash-regex
 import CoreData
@@ -12,7 +12,6 @@ import SystemConfiguration
 import UIKit
 import _Concurrency
 import _StringProcessing
-public let fairmaticErrorDomain: Swift.String
 @objc(FairmaticError) public enum FairmaticError : Swift.Int {
   case invalidSDKKeyString = 0
   case networkUnreachable = 1
@@ -25,19 +24,13 @@ public let fairmaticErrorDomain: Swift.String
   case invalidTrackingId = 105
   case notTornDown = 106
   case ioError = 107
-  case invalidRegion = 108
-  case regionUnsupported = 109
-  case unauthorizedRegionSwitch = 110
   case userDeprovisioned = 111
   case unsupportedVehicleType = 112
   case invalidBeaconUUID = 113
   case beaconNotFound = 114
-  case maxBeaconLimitReached = 115
-  case expiredPausedTillTimestamp = 116
-  case refreshBusinessHoursTimeout = 117
-  case refreshBusinessHoursNetworkNotAvailable = 118
-  case refreshBusinessHoursFeatureNotEnabled = 119
-  case sdkNotEnabled = 1000
+  case maxBeaconsLimitReached = 115
+  case sdkNotEnabled = 1002
+  case driverDeleted = 1003
   public init?(rawValue: Swift.Int)
   public typealias RawValue = Swift.Int
   public var rawValue: Swift.Int {
@@ -134,12 +127,6 @@ extension FairmaticSDK.FairmaticError : Foundation.LocalizedError {
   @objc public var sessionId: Swift.String?
   @objc deinit
 }
-@objc(FairmaticShiftInterval) final public class ShiftInterval : ObjectiveC.NSObject {
-  @objc final public var startTime: FairmaticSDK.ShiftTime
-  @objc final public var endTime: FairmaticSDK.ShiftTime
-  @objc public init(startTime: FairmaticSDK.ShiftTime, endTime: FairmaticSDK.ShiftTime)
-  @objc deinit
-}
 @objc(FairmaticSDKHealthReason) public enum SDKHealthReason : Swift.Int {
   case unknown
   case silentPushNotification
@@ -150,6 +137,7 @@ extension FairmaticSDK.FairmaticError : Foundation.LocalizedError {
     get
   }
 }
+@available(iOS 11.0, *)
 @objc(FairmaticDelegate) public protocol FairmaticDelegate : ObjectiveC.NSObjectProtocol {
   @objc optional func processStart(ofDrive startInfo: FairmaticSDK.DriveStartInfo)
   @objc optional func processResume(ofDrive resumeInfo: FairmaticSDK.DriveResumeInfo)
@@ -158,7 +146,6 @@ extension FairmaticSDK.FairmaticError : Foundation.LocalizedError {
   @objc optional func processPotentialAccidentDetected(_ accidentInfo: FairmaticSDK.AccidentInfo)
   @objc optional func processAccidentDetected(_ accidentInfo: FairmaticSDK.AccidentInfo)
   @objc optional func settingsChanged(_ settings: FairmaticSDK.Settings)
-  @objc optional func businessHoursChanged(_ businessHours: FairmaticSDK.ShiftDetail)
 }
 @objc(FairmaticSettings) public class Settings : ObjectiveC.NSObject {
   @objc public var errors: [FairmaticSDK.SettingsError]
@@ -219,8 +206,6 @@ extension FairmaticSDK.FairmaticError : Foundation.LocalizedError {
   @objc public var trackingId: Swift.String?
   @objc public var sessionId: Swift.String?
   @objc public var events: [FairmaticSDK.Event]
-  @objc public var score: FairmaticSDK.DriveScore
-  @objc public var eventRatings: FairmaticSDK.EventRatings
   @objc public var phonePosition: FairmaticSDK.PhonePosition
   @objc public var tripWarnings: [FairmaticSDK.TripWarning]
   @objc public var vehicleType: FairmaticSDK.VehicleType
@@ -245,36 +230,10 @@ extension FairmaticSDK.FairmaticError : Foundation.LocalizedError {
   @objc public var sessionId: Swift.String?
   @objc deinit
 }
-@objc public enum FairmaticDayOfWeek : Swift.Int {
-  case sunday = 1
-  case monday = 2
-  case tuesday = 3
-  case wednesday = 4
-  case thursday = 5
-  case friday = 6
-  case saturday = 7
-  public init?(rawValue: Swift.Int)
-  public typealias RawValue = Swift.Int
-  public var rawValue: Swift.Int {
-    get
-  }
-}
-@_hasMissingDesignatedInitializers @objc(FairmaticShiftTime) final public class ShiftTime : ObjectiveC.NSObject {
-  @objc final public var dayOfWeek: FairmaticSDK.FairmaticDayOfWeek
-  @objc final public var hour: Swift.Int
-  @objc final public var minute: Swift.Int
-  @objc convenience public init(dayOfWeek: FairmaticSDK.FairmaticDayOfWeek, hour: Swift.Int, minute: Swift.Int)
-  @objc deinit
-}
-public let fairmaticVehicleTaggingErrorDomain: Swift.String
 @objc(FairmaticVehicleTaggingError) public enum FairmaticVehicleTaggingError : Swift.Int {
   case notSetup = 0
-  case invalidVehicleInfo = 1
-  case associatedVehicleConflict = 2
-  case associatedVehiclesLimitExceeded = 3
-  case invalidVehicleId = 4
-  case vehicleNotAssociated = 5
   case beaconScanTimeout = 6
+  case unknownError = 1000
   public init?(rawValue: Swift.Int)
   public typealias RawValue = Swift.Int
   public var rawValue: Swift.Int {
@@ -304,13 +263,6 @@ extension FairmaticSDK.FairmaticVehicleTaggingError : Foundation.LocalizedError 
   @objc public func toDictionary() -> [Swift.AnyHashable : Any]!
   @objc deinit
 }
-@_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objc(FairmaticState) public class State : ObjectiveC.NSObject {
-  @objc public var fairmaticConfiguration: FairmaticSDK.Configuration!
-  @objc public var isDriveInProgress: Swift.Bool
-  @objc public var shiftDetails: FairmaticSDK.ShiftDetail?
-  @objc public var pausedTillTimestamp: Swift.Int64
-  @objc deinit
-}
 @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objc(FairmaticVehicleTaggingDetails) public class VehicleTaggingDetails : ObjectiveC.NSObject {
   @objc public var vehicleId: Swift.String
   @objc public var isTaggedByBeacon: Swift.Bool
@@ -328,23 +280,13 @@ extension FairmaticSDK.FairmaticVehicleTaggingError : Foundation.LocalizedError 
     get
   }
 }
-@objc(FairmaticRegion) public enum Region : Swift.Int {
-  case us
-  case eu
-  public init?(rawValue: Swift.Int)
-  public typealias RawValue = Swift.Int
-  public var rawValue: Swift.Int {
-    get
-  }
-}
-@_hasMissingDesignatedInitializers @objc(FairmaticConfiguration) public class Configuration : ObjectiveC.NSObject {
+@objc(FairmaticConfiguration) public class Configuration : ObjectiveC.NSObject {
   @objc public var sdkKey: Swift.String
   @objc public var driverId: Swift.String
-  @objc public var driverAttributes: FairmaticSDK.DriverAttributes?
+  @objc public var driverAttributes: FairmaticSDK.DriverAttributes
   @objc public var driveDetectionMode: FairmaticSDK.DriveDetectionMode
-  @objc public var region: FairmaticSDK.Region
   @objc public var implementsMultipleAccidentCallbacks: Swift.Bool
-  @objc convenience public init(applicationKey: Swift.String, driverId: Swift.String)
+  @objc public init(sdkKey: Swift.String, driverId: Swift.String, driverAttributes: FairmaticSDK.DriverAttributes)
   @objc deinit
 }
 @_hasMissingDesignatedInitializers @objc(FairmaticAnalyzedDriveInfo) public class AnalyzedDriveInfo : FairmaticSDK.DriveInfo {
@@ -489,20 +431,6 @@ extension FairmaticSDK.FairmaticVehicleTaggingError : Foundation.LocalizedError 
     get
   }
 }
-@objc public enum FairmaticPauseReason : Swift.Int {
-  case user
-  case businessHours
-  case notPaused
-  public init?(rawValue: Swift.Int)
-  public typealias RawValue = Swift.Int
-  public var rawValue: Swift.Int {
-    get
-  }
-}
-@_hasMissingDesignatedInitializers @objc(FairmaticPausedReason) final public class PausedReason : ObjectiveC.NSObject {
-  @objc final public var pausedReason: FairmaticSDK.FairmaticPauseReason
-  @objc deinit
-}
 @objc(FairmaticDriveCategory) public enum DriveCategory : Swift.Int {
   case car = 0
   case carDriver = 1
@@ -530,43 +458,21 @@ extension FairmaticSDK.FairmaticVehicleTaggingError : Foundation.LocalizedError 
   @objc deinit
 }
 @_inheritsConvenienceInitializers @objc(FairmaticDriverAttributesKeys) public class DriverAttributesKeys : ObjectiveC.NSObject {
-  @objc public static let driverAttributesKeyGroup: Swift.String
-  @objc public static let driverAttributesKeyPriority: Swift.String
-  @objc public static let driverAttributesKeyAlias: Swift.String
+  @objc public static let driverAttributesKeyName: Swift.String
   @objc public static let driverAttributesKeyEmail: Swift.String
   @objc public static let driverAttributesKeyPhone: Swift.String
   @objc override dynamic public init()
   @objc deinit
 }
-@objc(FairmaticServiceLevel) public enum ServiceLevel : Swift.Int {
-  case levelDefault
-  case level1
-  public init?(rawValue: Swift.Int)
-  public typealias RawValue = Swift.Int
-  public var rawValue: Swift.Int {
-    get
-  }
-}
-@_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objc(FairmaticDriverAttributes) public class DriverAttributes : ObjectiveC.NSObject {
+@objc(FairmaticDriverAttributes) public class DriverAttributes : ObjectiveC.NSObject {
+  @objc public init(name: Swift.String?, email: Swift.String?, phoneNumber: Swift.String?)
   @objc public func setEmailId(_ emailId: Swift.String)
   @objc public func setPhoneNumber(_ phoneNumber: Swift.String)
-  @objc public func setGroup(_ groupId: Swift.String) -> Swift.Bool
-  @objc public func setServiceLevel(_ serviceLevel: FairmaticSDK.ServiceLevel) -> Swift.Bool
   @objc public func setCustomAttribute(_ value: Swift.String, forKey key: Swift.String) -> Swift.Bool
-  @objc public func setAlias(_ alias: Swift.String) -> Swift.Bool
+  @objc public func setName(_ name: Swift.String)
   @objc public func setVehicleType(_ vehicleType: FairmaticSDK.VehicleType) -> Swift.Bool
   @objc public func asJson() -> Swift.String
   @objc public func asDictionary() -> [Swift.AnyHashable : Any]
-  @objc override convenience dynamic public init()
-  @objc deinit
-}
-@_inheritsConvenienceInitializers @objc(FairmaticDriveScore) public class DriveScore : ObjectiveC.NSObject {
-  @objc public var zendriveScore: Swift.Int {
-    @objc get
-    @objc set
-  }
-  @objc override dynamic public init()
-  @objc public init(zendriveScore: Swift.Int)
   @objc deinit
 }
 @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objc(FairmaticBluetoothDevice) public class BluetoothDevice : ObjectiveC.NSObject {
@@ -574,49 +480,10 @@ extension FairmaticSDK.FairmaticVehicleTaggingError : Foundation.LocalizedError 
   @objc public var identifier: Swift.String
   @objc deinit
 }
-@objc(FairmaticStarRating) public enum StarRating : Swift.Int {
-  case one = 1
-  case two = 2
-  case three = 3
-  case four = 4
-  case five = 5
-  case NA = -1
-  public init?(rawValue: Swift.Int)
-  public typealias RawValue = Swift.Int
-  public var rawValue: Swift.Int {
-    get
-  }
-}
-@_hasMissingDesignatedInitializers @objc(FairmaticEventRatings) public class EventRatings : ObjectiveC.NSObject {
-  public var phoneHandlingRating: FairmaticSDK.StarRating {
-    get
-  }
-  public var hardBrakeRating: FairmaticSDK.StarRating {
-    get
-  }
-  public var hardTurnRating: FairmaticSDK.StarRating {
-    get
-  }
-  public var speedingRating: FairmaticSDK.StarRating {
-    get
-  }
-  public var aggressiveAccelerationRating: FairmaticSDK.StarRating {
-    get
-  }
-  @objc deinit
-}
-@_inheritsConvenienceInitializers @objc(FairmaticTest) final public class FairmaticTest : ObjectiveC.NSObject {
+@_inheritsConvenienceInitializers @available(iOS 11.0, *)
+@objc(FairmaticTest) final public class FairmaticTest : ObjectiveC.NSObject {
   @objc public static func raiseMockAccident(_ confidence: FairmaticSDK.AccidentConfidence)
   @objc public static func raiseMockAccident(using config: FairmaticSDK.MockAccidentConfig)
-  @objc override dynamic public init()
-  @objc deinit
-}
-public typealias InsuranceAPICompletionHandler = ((Swift.Bool, (any Swift.Error)?) -> Swift.Void)
-@_inheritsConvenienceInitializers @objc(FairmaticInsurance) final public class FairmaticInsurance : ObjectiveC.NSObject {
-  @objc public static func startDrive(withPeriod1 completionHandler: FairmaticSDK.InsuranceAPICompletionHandler?)
-  @objc public static func startDrive(withPeriod2 trackingId: Swift.String, completionHandler: ((Swift.Bool, (any Swift.Error)?) -> Swift.Void)?)
-  @objc public static func startDrive(withPeriod3 trackingId: Swift.String, completionHandler: ((Swift.Bool, (any Swift.Error)?) -> Swift.Void)?)
-  @objc public static func stopPeriod(_ completionHandler: ((Swift.Bool, (any Swift.Error)?) -> Swift.Void)?)
   @objc override dynamic public init()
   @objc deinit
 }
@@ -627,33 +494,23 @@ public typealias InsuranceAPICompletionHandler = ((Swift.Bool, (any Swift.Error)
   @objc convenience public init(vehicleId: Swift.String, bluetoothId: Swift.String)
   @objc deinit
 }
-@objc(FairmaticShiftDetail) final public class ShiftDetail : ObjectiveC.NSObject {
-  @objc final public var shiftName: Swift.String?
-  @objc final public var shiftId: Swift.String
-  @objc final public var timezone: Foundation.TimeZone
-  @objc final public var shiftIntervals: [FairmaticSDK.ShiftInterval]
-  @objc public init(shiftName: Swift.String?, shiftId: Swift.String, timezone: Foundation.TimeZone, shiftIntervals: [FairmaticSDK.ShiftInterval])
-  @objc deinit
-}
 @_inheritsConvenienceInitializers @objc(FairmaticVehicleTagging) public class FairmaticVehicleTagging : ObjectiveC.NSObject {
-  @objc public static func associateVehicle(_ vehicleInfo: FairmaticSDK.VehicleInfo) throws
-  @objc public static func dissociateVehicle(_ vehicleId: Swift.String) throws
-  @objc public static func getAssociatedVehicles() -> [FairmaticSDK.VehicleInfo]?
-  @objc public static func getActiveBluetoothDevice() -> FairmaticSDK.BluetoothDevice?
-  @objc public static func getNearbyBeacons(uuid: Swift.String, major: Swift.Int32, minor: Swift.Int32, completionHandler: @escaping (_ scannedBeacons: [FairmaticSDK.ScannedBeaconInfo], _ error: (any Swift.Error)?) -> Swift.Void)
-  @objc public static func getNearbyBeacons(uuid: Swift.String, completionHandler: @escaping (_ scannedBeacons: [FairmaticSDK.ScannedBeaconInfo], _ error: (any Swift.Error)?) -> Swift.Void)
+  @objc public static func getNearbyBeacons(uuid: Swift.String, major: Swift.Int32, minor: Swift.Int32, completionHandler: @escaping (_ scannedBeacons: [FairmaticSDK.ScannedBeaconInfo], _ error: Swift.Error?) -> Swift.Void)
+  @objc public static func getNearbyBeacons(uuid: Swift.String, completionHandler: @escaping (_ scannedBeacons: [FairmaticSDK.ScannedBeaconInfo], _ error: Swift.Error?) -> Swift.Void)
   @objc override dynamic public init()
   @objc deinit
 }
-@_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objc(Fairmatic) final public class Fairmatic : ObjectiveC.NSObject {
-  @objc public static func setup(with configuration: FairmaticSDK.Configuration, delegate: (any FairmaticSDK.FairmaticDelegate)?, completionHandler handler: ((_ success: Swift.Bool, _ error: (any Swift.Error)?) -> Swift.Void)? = nil)
-  @objc public static func setDelegate(_ delegate: (any FairmaticSDK.FairmaticDelegate)?)
+public typealias InsuranceAPICompletionHandler = ((Swift.Bool, Swift.Error?) -> Swift.Void)
+@_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @available(iOS 11.0, *)
+@objc(Fairmatic) final public class Fairmatic : ObjectiveC.NSObject {
+  @objc public static func setup(with configuration: FairmaticSDK.Configuration, delegate: FairmaticSDK.FairmaticDelegate?, completionHandler handler: ((_ success: Swift.Bool, _ error: Swift.Error?) -> Swift.Void)? = nil)
+  @objc public static func setDelegate(_ delegate: FairmaticSDK.FairmaticDelegate?)
   @objc public static func getDriveDetectionMode() -> FairmaticSDK.DriveDetectionMode
-  @objc public static func setDriveDetectionMode(_ driveDetectionMode: FairmaticSDK.DriveDetectionMode, completionHandler: ((_ success: Swift.Bool, _ error: (any Swift.Error)?) -> Swift.Void)? = nil)
+  @objc public static func setDriveDetectionMode(_ driveDetectionMode: FairmaticSDK.DriveDetectionMode, completionHandler: ((_ success: Swift.Bool, _ error: Swift.Error?) -> Swift.Void)? = nil)
   @objc public static func teardown(completionHandler handler: (() -> Swift.Void)? = nil)
-  @objc public static func wipeOut(completion: (((any Swift.Error)?) -> Swift.Void)?)
-  @objc public static func startManualDrive(_ trackingId: Swift.String?, completionHandler: ((_ success: Swift.Bool, _ error: (any Swift.Error)?) -> Swift.Void)? = nil)
-  @objc public static func stopManualDrive(_ completionHandler: ((_ success: Swift.Bool, _ error: (any Swift.Error)?) -> Swift.Void)? = nil)
+  @objc public static func wipeOut(completion: ((Swift.Error?) -> Swift.Void)?)
+  @objc public static func startManualDrive(_ trackingId: Swift.String?, completionHandler: ((_ success: Swift.Bool, _ error: Swift.Error?) -> Swift.Void)? = nil)
+  @objc public static func stopManualDrive(_ completionHandler: ((_ success: Swift.Bool, _ error: Swift.Error?) -> Swift.Void)? = nil)
   @objc public static func startSession(_ sessionId: Swift.String)
   @objc public static func stopSession()
   @objc public static func isValidInputParameter(_ input: Swift.String?) -> Swift.Bool
@@ -666,7 +523,6 @@ public typealias InsuranceAPICompletionHandler = ((Swift.Bool, (any Swift.Error)
   @objc public static var activeDriveInfo: FairmaticSDK.ActiveDriveInfo? {
     @objc get
   }
-  @objc public static func getState(_ completionHandler: ((FairmaticSDK.State?) -> Swift.Void)? = nil)
   @objc public static var isAccidentDetectionSupportedByDevice: Swift.Bool {
     @objc get
   }
@@ -675,13 +531,14 @@ public typealias InsuranceAPICompletionHandler = ((Swift.Bool, (any Swift.Error)
   }
   @objc public static func uploadAllDebugDataAndLogs()
   @objc public static func getSettings() -> FairmaticSDK.Settings?
-  @objc public static func pauseAutoTracking(_ pausedTillTimestamp: Swift.Int64, completion: (((any Swift.Error)?) -> Swift.Void)?)
-  @objc public static func resumeAutoTracking(completion: (((any Swift.Error)?) -> Swift.Void)?) throws
-  @objc public static func isAutoTrackingPaused() throws -> Foundation.NSNumber
-  public static func getPausedReason() throws -> FairmaticSDK.PausedReason
-  @objc public static func refreshBusinessHours(completionHandler: @escaping (_ businessHours: FairmaticSDK.ShiftDetail?, _ error: Foundation.NSError?) -> Swift.Void)
-  @objc public static func logSDKHealth(_ reason: FairmaticSDK.SDKHealthReason, completionHandler: @escaping ((any Swift.Error)?) -> Swift.Void)
+  @objc public static func logSDKHealth(_ reason: FairmaticSDK.SDKHealthReason, completionHandler: @escaping (Swift.Error?) -> Swift.Void)
   @objc deinit
+}
+extension FairmaticSDK.Fairmatic {
+  @objc public static func startDriveWithPeriod1(completionHandler: FairmaticSDK.InsuranceAPICompletionHandler?)
+  @objc public static func startDrive(withPeriod2 trackingId: Swift.String, completionHandler: FairmaticSDK.InsuranceAPICompletionHandler?)
+  @objc public static func startDrive(withPeriod3 trackingId: Swift.String, completionHandler: FairmaticSDK.InsuranceAPICompletionHandler?)
+  @objc public static func stopPeriod(_ completionHandler: FairmaticSDK.InsuranceAPICompletionHandler?)
 }
 extension FairmaticSDK.FairmaticError : Swift.Equatable {}
 extension FairmaticSDK.FairmaticError : Swift.Hashable {}
@@ -713,18 +570,12 @@ extension FairmaticSDK.InsurancePeriod : Swift.RawRepresentable {}
 extension FairmaticSDK.PhonePosition : Swift.Equatable {}
 extension FairmaticSDK.PhonePosition : Swift.Hashable {}
 extension FairmaticSDK.PhonePosition : Swift.RawRepresentable {}
-extension FairmaticSDK.FairmaticDayOfWeek : Swift.Equatable {}
-extension FairmaticSDK.FairmaticDayOfWeek : Swift.Hashable {}
-extension FairmaticSDK.FairmaticDayOfWeek : Swift.RawRepresentable {}
 extension FairmaticSDK.FairmaticVehicleTaggingError : Swift.Equatable {}
 extension FairmaticSDK.FairmaticVehicleTaggingError : Swift.Hashable {}
 extension FairmaticSDK.FairmaticVehicleTaggingError : Swift.RawRepresentable {}
 extension FairmaticSDK.DriveDetectionMode : Swift.Equatable {}
 extension FairmaticSDK.DriveDetectionMode : Swift.Hashable {}
 extension FairmaticSDK.DriveDetectionMode : Swift.RawRepresentable {}
-extension FairmaticSDK.Region : Swift.Equatable {}
-extension FairmaticSDK.Region : Swift.Hashable {}
-extension FairmaticSDK.Region : Swift.RawRepresentable {}
 extension FairmaticSDK.TripWarningType : Swift.Equatable {}
 extension FairmaticSDK.TripWarningType : Swift.Hashable {}
 extension FairmaticSDK.TripWarningType : Swift.RawRepresentable {}
@@ -740,15 +591,6 @@ extension FairmaticSDK.DirectionOfImpact : Swift.RawRepresentable {}
 extension FairmaticSDK.VehicleType : Swift.Equatable {}
 extension FairmaticSDK.VehicleType : Swift.Hashable {}
 extension FairmaticSDK.VehicleType : Swift.RawRepresentable {}
-extension FairmaticSDK.FairmaticPauseReason : Swift.Equatable {}
-extension FairmaticSDK.FairmaticPauseReason : Swift.Hashable {}
-extension FairmaticSDK.FairmaticPauseReason : Swift.RawRepresentable {}
 extension FairmaticSDK.DriveCategory : Swift.Equatable {}
 extension FairmaticSDK.DriveCategory : Swift.Hashable {}
 extension FairmaticSDK.DriveCategory : Swift.RawRepresentable {}
-extension FairmaticSDK.ServiceLevel : Swift.Equatable {}
-extension FairmaticSDK.ServiceLevel : Swift.Hashable {}
-extension FairmaticSDK.ServiceLevel : Swift.RawRepresentable {}
-extension FairmaticSDK.StarRating : Swift.Equatable {}
-extension FairmaticSDK.StarRating : Swift.Hashable {}
-extension FairmaticSDK.StarRating : Swift.RawRepresentable {}
