@@ -392,12 +392,17 @@ SWIFT_CLASS_NAMED("DriveInfo")
 /// automobile trips (Eg. biking, public transport).
 @property (nonatomic) enum FairmaticDriveType driveType;
 /// Whether the user was a driver or a passenger.
-/// Driver/Passenger detection is disabled by default. Talk to your
-/// contact in <code>Fairmatic</code> to enable this feature. Only present when <code>driveType</code> is
+/// Driver/Passenger detection is disabled by default. Reach out to your
+/// contact at Fairmatic to enable this feature.
+/// Only present when <code>driveType</code> is
 /// <code>DriveType/drive</code> and the SDK was able to determine with confidence
 /// whether the user was a driver or a passenger.
 /// If the SDK was not able to determine the user mode, this field is
 /// <code>UserMode/unavailable</code>.
+/// <blockquote>
+/// Driver/Passenger detection is disabled by default
+///
+/// </blockquote>
 @property (nonatomic) enum FairmaticUserMode userMode;
 /// The insurance period for this drive
 @property (nonatomic) enum FairmaticInsurancePeriod insurancePeriod;
@@ -464,18 +469,6 @@ SWIFT_CLASS_NAMED("AnalyzedDriveInfo")
 @interface FairmaticAnalyzedDriveInfo : FairmaticDriveInfo
 @end
 
-
-/// Wrapper to describe a bluetooth device.
-SWIFT_CLASS_NAMED("BluetoothDevice")
-@interface FairmaticBluetoothDevice : NSObject
-/// The name of the bluetooth device.
-@property (nonatomic, copy) NSString * _Nonnull name;
-/// The mac address of the bluetooth device.
-@property (nonatomic, copy) NSString * _Nonnull identifier;
-- (nonnull instancetype)init SWIFT_UNAVAILABLE;
-+ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
-@end
-
 /// Collision severity of the detected accident.
 typedef SWIFT_ENUM_NAMED(NSInteger, FairmaticCollisionSeverity, "CollisionSeverity", open) {
 /// Unknown severity collision.
@@ -509,7 +502,6 @@ SWIFT_CLASS_NAMED("Configuration")
 /// on the server when a non-nil value for this param is passed. Passing nil is a no-op.
 /// Use this param to provide meta-information about the user like name,
 /// email, phone number or any custom attributes you wish to provide.
-/// Default value is <code>nil</code>.
 @property (nonatomic, strong) FairmaticDriverAttributes * _Nonnull driverAttributes;
 /// Use this mode to control the SDK’s behaviour for detecting drives
 /// automatically. This mode can be changed at a later point using
@@ -547,41 +539,6 @@ typedef SWIFT_ENUM_NAMED(NSInteger, FairmaticDirectionOfImpact, "DirectionOfImpa
   FairmaticDirectionOfImpactBroadside = 3,
 };
 
-
-/// The category that best indicates the type of trip
-typedef SWIFT_ENUM_NAMED(NSInteger, FairmaticDriveCategory, "DriveCategory", open) {
-/// Indicates that the trip was taken in a car
-  FairmaticDriveCategoryCar = 0,
-/// Indicates that the trip was taken in a car and the user was the driver
-  FairmaticDriveCategoryCarDriver = 1,
-/// Indicates that the trip was taken in a car and the user was a passenger
-  FairmaticDriveCategoryCarPassenger = 2,
-/// Indicates that the trip was taken in a train or a subway
-  FairmaticDriveCategoryTrain = 3,
-/// Indicates that the trip was taken in a bus
-  FairmaticDriveCategoryBus = 4,
-/// Indicates that the trip was taken on a bicycle
-  FairmaticDriveCategoryBicycle = 5,
-/// Indicates that the trip was taken on a motorcycle
-  FairmaticDriveCategoryMotorcycle = 6,
-/// Indicates that the trip was taken on foot (either walking or running)
-  FairmaticDriveCategoryFoot = 7,
-/// Indicates that the trip was taken using some form of public transit
-/// (bus/train/subway/tram etc)
-  FairmaticDriveCategoryTransit = 8,
-/// Indicates that the trip was taken using some form of air travel
-  FairmaticDriveCategoryFlight = 9,
-/// Indicates that there wasn’t enough movement and this shouldn’t have been
-/// detected as a trip
-  FairmaticDriveCategoryInvalid = 97,
-/// Indicates that the trip was not taken in a car. This includes everything
-/// other than <code>DriveCategory/car</code>
-  FairmaticDriveCategoryNotCar = 98,
-/// Fallback when the above options do not cover the use case.
-/// This maybe used when the mode of transport is not covered above (eg. snow-mobile) or
-/// when enough information is not available to put it in one of the above categories
-  FairmaticDriveCategoryOther = 99,
-};
 
 /// Dictates the functioning of Fairmatic’s drive detection.
 typedef SWIFT_ENUM_NAMED(NSInteger, FairmaticDriveDetectionMode, "DriveDetectionMode", open) {
@@ -1222,7 +1179,10 @@ SWIFT_PROTOCOL_NAMED("FairmaticDelegate") SWIFT_AVAILABILITY(ios,introduced=11.0
 /// [Disabled by default]
 /// This callback is fired on the main thread when a potential accident is detected by the SDK during a drive.
 /// This is a preliminary callback of a potential collision. This collision is confirmed or invalidated by <code>processAccidentDetected(_:)</code> callback.
-/// To enable, reach out to your contact at Fairmatic
+/// <blockquote>
+/// This is disabled by default. To enable, reach out to your contact at Fairmatic
+///
+/// </blockquote>
 /// \param accidentInfo Info about accident.
 ///
 - (void)processPotentialAccidentDetected:(FairmaticAccidentInfo * _Nonnull)accidentInfo;
@@ -1319,37 +1279,12 @@ typedef SWIFT_ENUM_NAMED(NSInteger, FairmaticError, "FairmaticError", open) {
   FairmaticErrorBeaconNotFound = 114,
 /// maximum number of beacons registered for a given user has been reached.
   FairmaticErrorMaxBeaconsLimitReached = 115,
-/// This error is thrown when the Fairmatic SDK is not enabled for the current customer. Please get in touch with your contact at Fairmatic to get it enabled and then retry the <code>Fairmatic/setup(with:delegate:completionHandler:)</code> API.
+/// This error is thrown when the use of the Fairmatic SDK is not enabled for the current customer. Please get in touch with your contact at Fairmatic to get it enabled and then retry the <code>Fairmatic/setup(with:delegate:completionHandler:)</code> API.
   FairmaticErrorSdkNotEnabled = 1002,
 /// This error is thrown by the <code>Fairmatic/setup(with:delegate:completionHandler:)</code> API when the driver associated with the provided <code>Configuration/driverId</code> has been deleted. Please get in touch with your contact at Fairmatic with the <code>driverId</code>.
   FairmaticErrorDriverDeleted = 1003,
 };
 static NSString * _Nonnull const FairmaticErrorDomain = @"FairmaticSDK.FairmaticError";
-
-
-/// Class for providing feedback back to <code>Fairmatic</code>
-SWIFT_CLASS_NAMED("FairmaticFeedback")
-@interface FairmaticFeedback : NSObject
-/// Help <code>Fairmatic</code> improve by providing feedback for a drive detected by the SDK.
-/// \param driveId As returned at the end of drive in <code>DriveInfo</code>.
-///
-/// \param driveCategory The category that best indicates the type of Drive.
-///
-+ (void)addDriveCategoryWithDriveId:(NSString * _Nonnull)driveId driveCategory:(enum FairmaticDriveCategory)driveCategory;
-/// Help <code>Fairmatic</code> improve by providing information about whether an
-/// event detected by the SDK occurred or not.
-/// \param driveId As returned at the end of drive in <code>DriveInfo</code> which
-/// this event is part of
-///
-/// \param eventTimestamp As returned in <code>Event.startTime</code>
-///
-/// \param eventType As returned in <code>Event.eventType</code>
-///
-/// \param occurrence Whether the event occurred or not
-///
-+ (void)addEventOccurrenceWithDriveId:(NSString * _Nonnull)driveId eventTimestamp:(int64_t)eventTimestamp eventType:(enum FairmaticventType)eventType occurrence:(BOOL)occurrence;
-- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
-@end
 
 @class FairmaticMockAccidentConfig;
 
@@ -1357,7 +1292,7 @@ SWIFT_CLASS_NAMED("FairmaticFeedback")
 SWIFT_CLASS_NAMED("FairmaticTest") SWIFT_AVAILABILITY(ios,introduced=11.0)
 @interface FairmaticTest : NSObject
 /// Use this method to test <code>Fairmatic</code> Accident detection integration. Works only in
-/// DEBUG mode, disabled in RELEASE mode.
+/// <code>DEBUG</code> mode, disabled in <code>RELEASE</code> mode.
 /// On invoking this method, you will get an accident callback finalId on your
 /// delegate after 5 seconds. You can look at console logs for debugging in case you
 /// do not receive the callback. If issue persists, reach out to your contact at Fairmatic.
@@ -1367,8 +1302,8 @@ SWIFT_CLASS_NAMED("FairmaticTest") SWIFT_AVAILABILITY(ios,introduced=11.0)
 /// \param confidence Any value from <code>AccidentConfidence</code> enum.
 ///
 + (void)raiseMockAccident:(enum FairmaticAccidentConfidence)confidence;
-/// Use this method to test <code>Fairmatic</code> Accident detection integration. Works only in DEBUG mode,
-/// disabled in RELEASE mode.
+/// Use this method to test <code>Fairmatic</code> Accident detection integration. Works only in <code>DEBUG</code> mode,
+/// disabled in <code>RELEASE</code> mode.
 /// This API can be used to test multiple callbacks. You need to enable <code>Configuration/implementsMultipleAccidentCallbacks</code>
 /// for that.
 /// In case of multiple callbacks enabled, on invoking this method, you will get a potential accident callback
@@ -1557,7 +1492,7 @@ typedef SWIFT_ENUM_NAMED(NSInteger, FairmaticPhonePosition, "PhonePosition", ope
 /// Dictates the reason for is logging SDK Health
 /// The SDK health will be recorded when there is any update in permission from last recorded SDK health.
 typedef SWIFT_ENUM_NAMED(NSInteger, FairmaticSDKHealthReason, "SDKHealthReason", open) {
-/// Indicates the reason  is unknown.
+/// Indicates the reason is unknown.
 /// This is the default value.
   FairmaticSDKHealthReasonUnknown = 0,
 /// Indicates the SDK health will recorded due to silent push notification
@@ -1704,40 +1639,6 @@ typedef SWIFT_ENUM_NAMED(NSInteger, FairmaticUserMode, "UserMode", open) {
   FairmaticUserModeUnavailable = 2,
 };
 
-
-/// Wrapper for meta-information related to a vehicle.
-SWIFT_CLASS_NAMED("VehicleInfo")
-@interface FairmaticVehicleInfo : NSObject
-/// The unique identifier for the vehicle.
-/// This should not be nil, should not have more than 64 characters
-/// and should satisfy <code>Fairmatic/isValidInputParameter(_:)</code>.
-@property (nonatomic, copy) NSString * _Nonnull vehicleId;
-/// The mac address of vehicles’s bluetooth device.
-@property (nonatomic, copy) NSString * _Nonnull bluetoothId;
-/// Initializer for <code>VehicleInfo</code>.
-- (nonnull instancetype)init;
-/// Initializer for <code>VehicleInfo</code>.
-/// \param vehicleId The identifier for the vehicle.
-///
-/// \param bluetoothId The mac address of vehicle’s bluetooth device.
-///
-- (nonnull instancetype)initWithVehicleId:(NSString * _Nonnull)vehicleId bluetoothId:(NSString * _Nonnull)bluetoothId;
-@end
-
-
-/// Wrapper for vehicle tagging details for a drive.
-SWIFT_CLASS_NAMED("VehicleTaggingDetails")
-@interface FairmaticVehicleTaggingDetails : NSObject
-/// The vehicleId of the tagged vehicle
-@property (nonatomic, copy) NSString * _Nonnull vehicleId;
-/// This flag determines if vehicle is tagged using beacon
-@property (nonatomic) BOOL isTaggedByBeacon;
-/// This flag determines if vehicle is tagged using bluetooth stereo
-@property (nonatomic) BOOL isTaggedByBluetoothStereo;
-/// Initializer for <code>VehicleTaggingDetails</code>.
-- (nonnull instancetype)init;
-@end
-
 /// Type of vehicle used in the drive recorded by the Fairmatic SDK.
 /// A default vehicle type can be set using <code>DriverAttributes/setVehicleType(_:)</code>
 /// in <code>DriverAttributes</code>. The detected type is returned to the application in the <code>DriveInfo/vehicleType</code>
@@ -1750,7 +1651,6 @@ typedef SWIFT_ENUM_NAMED(NSInteger, FairmaticVehicleType, "VehicleType", open) {
 /// Indicates that the user was not driving.
   FairmaticVehicleTypeUnknown = -1,
 };
-
 
 #endif
 #if defined(__cplusplus)

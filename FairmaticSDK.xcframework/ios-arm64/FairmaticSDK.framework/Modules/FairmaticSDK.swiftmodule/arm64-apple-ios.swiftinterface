@@ -263,13 +263,6 @@ extension FairmaticSDK.FairmaticVehicleTaggingError : Foundation.LocalizedError 
   @objc public func toDictionary() -> [Swift.AnyHashable : Any]!
   @objc deinit
 }
-@_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objc(FairmaticVehicleTaggingDetails) public class VehicleTaggingDetails : ObjectiveC.NSObject {
-  @objc public var vehicleId: Swift.String
-  @objc public var isTaggedByBeacon: Swift.Bool
-  @objc public var isTaggedByBluetoothStereo: Swift.Bool
-  @objc override convenience dynamic public init()
-  @objc deinit
-}
 @objc(FairmaticDriveDetectionMode) public enum DriveDetectionMode : Swift.Int {
   case autoON
   case autoOFF
@@ -431,32 +424,6 @@ extension FairmaticSDK.FairmaticVehicleTaggingError : Foundation.LocalizedError 
     get
   }
 }
-@objc(FairmaticDriveCategory) public enum DriveCategory : Swift.Int {
-  case car = 0
-  case carDriver = 1
-  case carPassenger = 2
-  case train = 3
-  case bus = 4
-  case bicycle = 5
-  case motorcycle = 6
-  case foot = 7
-  case transit = 8
-  case flight = 9
-  case invalid = 97
-  case notCar = 98
-  case other = 99
-  public init?(rawValue: Swift.Int)
-  public typealias RawValue = Swift.Int
-  public var rawValue: Swift.Int {
-    get
-  }
-}
-@_inheritsConvenienceInitializers @objc(FairmaticFeedback) final public class FairmaticFeedback : ObjectiveC.NSObject {
-  @objc public static func addDriveCategory(driveId: Swift.String, driveCategory: FairmaticSDK.DriveCategory)
-  @objc public static func addEventOccurrence(driveId: Swift.String, eventTimestamp: Swift.Int64, eventType: FairmaticSDK.EventType, occurrence: Swift.Bool)
-  @objc override dynamic public init()
-  @objc deinit
-}
 @_inheritsConvenienceInitializers @objc(FairmaticDriverAttributesKeys) public class DriverAttributesKeys : ObjectiveC.NSObject {
   @objc public static let driverAttributesKeyName: Swift.String
   @objc public static let driverAttributesKeyEmail: Swift.String
@@ -475,23 +442,11 @@ extension FairmaticSDK.FairmaticVehicleTaggingError : Foundation.LocalizedError 
   @objc public func asDictionary() -> [Swift.AnyHashable : Any]
   @objc deinit
 }
-@_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objc(FairmaticBluetoothDevice) public class BluetoothDevice : ObjectiveC.NSObject {
-  @objc public var name: Swift.String
-  @objc public var identifier: Swift.String
-  @objc deinit
-}
 @_inheritsConvenienceInitializers @available(iOS 11.0, *)
 @objc(FairmaticTest) final public class FairmaticTest : ObjectiveC.NSObject {
   @objc public static func raiseMockAccident(_ confidence: FairmaticSDK.AccidentConfidence)
   @objc public static func raiseMockAccident(using config: FairmaticSDK.MockAccidentConfig)
   @objc override dynamic public init()
-  @objc deinit
-}
-@_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objc(FairmaticVehicleInfo) final public class VehicleInfo : ObjectiveC.NSObject {
-  @objc final public var vehicleId: Swift.String
-  @objc final public var bluetoothId: Swift.String
-  @objc override convenience dynamic public init()
-  @objc convenience public init(vehicleId: Swift.String, bluetoothId: Swift.String)
   @objc deinit
 }
 @_inheritsConvenienceInitializers @objc(FairmaticVehicleTagging) public class FairmaticVehicleTagging : ObjectiveC.NSObject {
@@ -591,6 +546,3 @@ extension FairmaticSDK.DirectionOfImpact : Swift.RawRepresentable {}
 extension FairmaticSDK.VehicleType : Swift.Equatable {}
 extension FairmaticSDK.VehicleType : Swift.Hashable {}
 extension FairmaticSDK.VehicleType : Swift.RawRepresentable {}
-extension FairmaticSDK.DriveCategory : Swift.Equatable {}
-extension FairmaticSDK.DriveCategory : Swift.Hashable {}
-extension FairmaticSDK.DriveCategory : Swift.RawRepresentable {}
